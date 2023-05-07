@@ -2,12 +2,9 @@ package writer
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"sync/atomic"
-
-	"github.com/cheeyeo/AWS_S3_PIPES/files"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -29,16 +26,13 @@ func (p *s3WriterAt) WriteAt(b []byte, off int64) (n int, err error) {
 	return p.w.Write(b)
 }
 
-func PipeDownload(ctx context.Context, bucket string, source string, pipeFile *os.File, fileSize int64) (int64, error) {
+func PipeDownload(ctx context.Context, sess *session.Session, bucket string, source string, pipeFile *os.File, fileSize int64) (int64, error) {
 	// Reads the source from the bucket and stream it into pipeFile
-	sess := session.Must(session.NewSession())
 	downloader := s3manager.NewDownloader(sess, func(d *s3manager.Downloader) {
 		d.Concurrency = 10
 		d.PartSize = 25 * 1024 * 1024 // 20MB part size
 		d.BufferProvider = s3manager.NewPooledBufferedWriterReadFromProvider(25 * 1024 * 1024)
 	})
-
-	fmt.Println("\nStarting Download, Size: ", files.ByteCountDecimal(fileSize))
 
 	writer := &s3WriterAt{w: pipeFile, size: fileSize, written: 0}
 	n, err := downloader.DownloadWithContext(ctx, writer, &s3.GetObjectInput{
@@ -47,7 +41,7 @@ func PipeDownload(ctx context.Context, bucket string, source string, pipeFile *o
 	})
 
 	if err != nil {
-		return n, err
+		return 0, err
 	}
 
 	return n, nil

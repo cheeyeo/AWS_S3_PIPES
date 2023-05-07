@@ -2,7 +2,6 @@ package reader
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 
@@ -50,15 +49,15 @@ func PipeUpload(ctx context.Context, sess *session.Session, bucket string, key s
 		return &s3manager.UploadOutput{}, err
 	}
 
-	fmt.Println("S3 upload successful.")
-	fmt.Printf("Location: %s\n", n.Location)
-	if n.VersionID != nil {
-		fmt.Printf("VersionID: %s\n", *n.VersionID)
-	}
-	if len(n.UploadID) > 0 {
-		fmt.Printf("UploadID: %s\n", n.UploadID)
-	}
-	fmt.Printf("ETag: %s\n", *n.ETag)
+	// fmt.Println("S3 upload successful.")
+	// fmt.Printf("Location: %s\n", n.Location)
+	// if n.VersionID != nil {
+	// 	fmt.Printf("VersionID: %s\n", *n.VersionID)
+	// }
+	// if len(n.UploadID) > 0 {
+	// 	fmt.Printf("UploadID: %s\n", n.UploadID)
+	// }
+	// fmt.Printf("ETag: %s\n", *n.ETag)
 
 	return n, nil
 }

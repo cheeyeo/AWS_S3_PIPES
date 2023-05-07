@@ -4,12 +4,26 @@ Utility to perform S3 uploads and downloads using named pipes with the AWS GO SD
 
 Supports:
 * Stream upload via named pipes
+
 * Stream download via named pipes
 
 
 ### Run
 
 Run `make build` which installs the binary into `/tmp/bin/s3pipe`
+
+You need to ensure that the named pipe exists first; if not run:
+```
+mkfifo <NAME OF PIPE>
+```
+
+Also ensure your AWS credentials are reachable via:
+```
+export AWS_PROFILE=XXX
+
+export AWS_REGION=XXX
+```
+
 
 It supports only 2 actions `upload` and `download` with the same parameters:
 ```
@@ -65,9 +79,7 @@ The packages are organized as such:
 
 * s3helpers - Helpers for S3 service
 
-
-The tests are located in the `tests` directory
-
+The tests are located in the `tests` directory.
 
 To run the tests:
 ```

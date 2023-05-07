@@ -71,7 +71,7 @@ func Download(pipe string, bucket string, key string, file string) {
 		exitErrorf("Error in download: %v\n", err)
 	}
 
-	fmt.Printf("Downloaded File: %d bytes", pipeInput.FSize)
+	fmt.Printf("Downloaded File: %d bytes\n", pipeInput.FSize)
 }
 
 func Upload(pipe string, bucket string, key string, file string) {

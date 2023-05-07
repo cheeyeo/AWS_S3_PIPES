@@ -10,8 +10,7 @@ import (
 )
 
 // Get file size of remote s3 object given a bucket and prefix
-func GetS3FileSize(bucket string, prefix string) (filesize int64, error error) {
-	sess := session.Must(session.NewSession())
+func GetS3FileSize(sess *session.Session, bucket string, prefix string) (filesize int64, error error) {
 	svc := s3.New(sess)
 	params := &s3.HeadObjectInput{
 		Bucket: aws.String(bucket),

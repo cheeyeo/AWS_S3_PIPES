@@ -6,13 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
 
 	"github.com/cheeyeo/AWS_S3_PIPES/reader"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/awstesting"
@@ -27,36 +25,14 @@ const respMsg = `<?xml version="1.0" encoding="UTF-8"?>
    <ETag>mockValue</ETag>
 </CompleteMultipartUploadOutput>`
 
-func createTempFile(t *testing.T, size int64) (*os.File, func(*testing.T), error) {
-	file, err := ioutil.TempFile(os.TempDir(), aws.SDKName+t.Name())
-	if err != nil {
-		return nil, nil, err
-	}
-	filename := file.Name()
-	if err := file.Truncate(size); err != nil {
-		return nil, nil, err
-	}
-
-	return file,
-		func(t *testing.T) {
-			if err := file.Close(); err != nil {
-				t.Errorf("failed to close temp file, %s, %v", filename, err)
-			}
-			if err := os.Remove(filename); err != nil {
-				t.Errorf("failed to remove temp file, %s, %v", filename, err)
-			}
-		},
-		nil
-}
-
-func TestReaderPipeUpload_Fail(t *testing.T) {
+func TestReaderPipeUpload_ContextCancelled(t *testing.T) {
 	sess := unit.Session
 
 	ctx := &awstesting.FakeContext{DoneCh: make(chan struct{})}
 	ctx.Error = fmt.Errorf("context canceled")
 	close(ctx.DoneCh)
 
-	pipe, _, _ := createTempFile(t, 1)
+	pipe, _, _ := CreateTempFile(t, 1)
 
 	_, err := reader.PipeUpload(ctx, sess, "Bucket", "Key", pipe)
 	if err == nil {
@@ -72,7 +48,7 @@ func TestReaderPipeUpload_Fail(t *testing.T) {
 	}
 }
 
-func TestReaderPipeUpload_Pass(t *testing.T) {
+func TestReaderPipeUpload(t *testing.T) {
 	// Below clears the session handlers and prevent S3 from making actual s3 calls
 	sess := unit.Session
 	sess.Handlers.Unmarshal.Clear()
@@ -88,11 +64,11 @@ func TestReaderPipeUpload_Pass(t *testing.T) {
 		}
 	})
 
-	pipe, _, _ := createTempFile(t, 1)
+	pipe, _, _ := CreateTempFile(t, 1)
 
 	_, err := reader.PipeUpload(context.Background(), sess, "Bucket", "Key", pipe)
 
 	if err != nil {
-		t.Errorf("Expected error but got nil")
+		t.Errorf("Expected nil but got error: %v\n", err)
 	}
 }
