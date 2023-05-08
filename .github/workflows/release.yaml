@@ -1,0 +1,36 @@
+name: Release go module
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.20.3
+    
+    - name: Install depedencies
+      run: |
+        go mod download
+        go mod tidy -v
+    
+    - name: Pre-release checks
+      run: |
+        make production/checks
+
+    - name: Publish
+      uses: wangyoucao577/go-release-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: linux
+        goarch: amd64
+        goversion: "https://dl.google.com/go/go1.20.3.linux-amd64.tar.gz"
+        project_path: "./cmd"
+        binary_name: "s3pipe"
+        executable_compression: "upx -5"

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -30,7 +30,7 @@ func TestWriterPipeDownload_ContextCancelled(t *testing.T) {
 
 		r.HTTPResponse = &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+			Body:       io.NopCloser(bytes.NewReader([]byte{})),
 			Header:     http.Header{},
 		}
 		r.HTTPResponse.Header.Set("Content-Length", fmt.Sprintf("%d", 1))
@@ -81,7 +81,7 @@ func TestWriterPipeDownload(t *testing.T) {
 
 		r.HTTPResponse = &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewReader(bodyBytes)),
+			Body:       io.NopCloser(bytes.NewReader(bodyBytes)),
 			Header:     http.Header{},
 		}
 		r.HTTPResponse.Header.Set("Content-Range", fmt.Sprintf("bytes %d-%d/%d", start, fin-1, len(data)))

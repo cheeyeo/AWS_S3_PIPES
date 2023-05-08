@@ -14,13 +14,12 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-// Represents input for the download
+// DownloadInput represents source of pipe
 type DownloadInput struct {
 	FSize int64
 }
 
-// Represents target for the download
-// Can be to a local file or nil
+// DownloadOutput represents target for the download
 type DownloadOutput struct {
 	File string
 }

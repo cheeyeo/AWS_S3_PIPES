@@ -15,7 +15,7 @@ func exitErrorf(msg string, args ...interface{}) {
 	os.Exit(1)
 }
 
-// Downloads the stream
+// Download stream
 func Download(pipe string, bucket string, key string, file string) {
 	g, ctx := errgroup.WithContext(context.Background())
 	pipeInput := &pipes.DownloadInput{}

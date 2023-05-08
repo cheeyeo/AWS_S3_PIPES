@@ -20,14 +20,14 @@ func (r *s3Reader) Read(p []byte) (int, error) {
 	r.read += int64(n)
 
 	// TODO: Figure out how to create progressbars here?
-	if err == nil {
-		// if n > 0 {
-		// 	fmt.Printf("Total Read: %d\r", r.read)
-		// }
-	}
-	if err == io.EOF {
-		// fmt.Println("Finished Read!")
-	}
+	// if err == nil {
+	// 	// if n > 0 {
+	// 	// 	fmt.Printf("Total Read: %d\r", r.read)
+	// 	// }
+	// }
+	// if err == io.EOF {
+	// 	// fmt.Println("Finished Read!")
+	// }
 
 	return n, err
 }

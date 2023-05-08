@@ -4,7 +4,7 @@ import (
 	"bytes"
 
 	// "fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -20,7 +20,7 @@ func TestBucketValidator(t *testing.T) {
 	sess.Handlers.Send.PushBack(func(r *request.Request) {
 		r.HTTPResponse = &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+			Body:       io.NopCloser(bytes.NewReader([]byte{})),
 		}
 	})
 
@@ -40,7 +40,7 @@ func TestBucketValidatorNotFound(t *testing.T) {
 	sess.Handlers.Send.PushBack(func(r *request.Request) {
 		r.HTTPResponse = &http.Response{
 			StatusCode: 404,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+			Body:       io.NopCloser(bytes.NewReader([]byte{})),
 		}
 	})
 
@@ -63,7 +63,7 @@ func TestBucketValidatorForbidden(t *testing.T) {
 	sess.Handlers.Send.PushBack(func(r *request.Request) {
 		r.HTTPResponse = &http.Response{
 			StatusCode: 403,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+			Body:       io.NopCloser(bytes.NewReader([]byte{})),
 		}
 	})
 
@@ -86,7 +86,7 @@ func TestBucketValidatorBadRequest(t *testing.T) {
 	sess.Handlers.Send.PushBack(func(r *request.Request) {
 		r.HTTPResponse = &http.Response{
 			StatusCode: 400,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+			Body:       io.NopCloser(bytes.NewReader([]byte{})),
 		}
 	})
 
@@ -114,7 +114,7 @@ func TestGetS3FileSize(t *testing.T) {
 		r.HTTPRequest.Method = "HEAD"
 		r.HTTPResponse = &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+			Body:       io.NopCloser(bytes.NewReader([]byte{})),
 			Header:     resp,
 		}
 	})
@@ -136,7 +136,7 @@ func TestGetS3FileSizeError(t *testing.T) {
 		r.HTTPRequest.Method = "HEAD"
 		r.HTTPResponse = &http.Response{
 			StatusCode: 500,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte{})),
+			Body:       io.NopCloser(bytes.NewReader([]byte{})),
 			Header:     resp,
 		}
 	})
