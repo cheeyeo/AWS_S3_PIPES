@@ -44,6 +44,10 @@ test/cover:
 	go tool cover -html=/tmp/coverage.out
 
 
+## production/check: Check the application before deploy
+.PHONY: production/checks
+production/checks: tidy audit no-dirty
+
 ## production/deploy: deploy the application to production
 .PHONY: production/deploy
 production/deploy: tidy audit no-dirty
