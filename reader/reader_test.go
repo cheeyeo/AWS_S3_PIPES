@@ -1,4 +1,4 @@
-package tests
+package reader
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cheeyeo/AWS_S3_PIPES/reader"
+	"github.com/cheeyeo/AWS_S3_PIPES/tests"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -32,9 +32,9 @@ func TestReaderPipeUpload_ContextCancelled(t *testing.T) {
 	ctx.Error = fmt.Errorf("context canceled")
 	close(ctx.DoneCh)
 
-	pipe, _, _ := CreateTempFile(t, 1)
+	pipe, _, _ := tests.CreateTempFile(t, 1)
 
-	_, err := reader.PipeUpload(ctx, sess, "Bucket", "Key", pipe)
+	_, err := PipeUpload(ctx, sess, "Bucket", "Key", pipe)
 	if err == nil {
 		t.Errorf("Expected error but got nil")
 	}
@@ -64,10 +64,9 @@ func TestReaderPipeUpload(t *testing.T) {
 		}
 	})
 
-	pipe, _, _ := CreateTempFile(t, 1)
+	pipe, _, _ := tests.CreateTempFile(t, 1)
 
-	_, err := reader.PipeUpload(context.Background(), sess, "Bucket", "Key", pipe)
-
+	_, err := PipeUpload(context.Background(), sess, "Bucket", "Key", pipe)
 	if err != nil {
 		t.Errorf("Expected nil but got error: %v\n", err)
 	}

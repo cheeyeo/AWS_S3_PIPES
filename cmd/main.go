@@ -15,38 +15,6 @@ func exitErrorf(msg string, args ...interface{}) {
 	os.Exit(1)
 }
 
-type Fetcher interface {
-	Fetch(ctx context.Context, pipe string, bucket string, key string) error
-}
-
-type WithCancellation struct {
-	fetcher Fetcher
-}
-
-func (c *WithCancellation) Fetch(ctx context.Context, pipe string, bucket string, key string) error {
-
-	errChan := make(chan error)
-
-	go func() {
-		err := c.fetcher.Fetch(ctx, pipe, bucket, key)
-		errChan <- err
-	}()
-	defer close(errChan)
-
-	for {
-		select {
-		case err2 := <-errChan:
-			// fmt.Printf("ERR OCCURED: %v\n", err2)
-			return err2
-		case <-ctx.Done():
-			// fmt.Println("FUN CANCELLED")
-			return ctx.Err()
-		}
-	}
-
-	// return nil
-}
-
 // Downloads the stream
 func Download(pipe string, bucket string, key string, file string) {
 	g, ctx := errgroup.WithContext(context.Background())
@@ -58,13 +26,13 @@ func Download(pipe string, bucket string, key string, file string) {
 	// One to read from target end of pipe either to local file
 	// if file arg specified; else it loops waiting to be read via STDIN
 	g.Go(func() error {
-		c := &WithCancellation{fetcher: pipeOutput}
-		return c.Fetch(ctx, pipe, bucket, key)
+		c := pipes.NewPipeWithCancellation(pipeOutput)
+		return c.Stream(ctx, pipe, bucket, key)
 	})
 
 	g.Go(func() error {
-		c := &WithCancellation{fetcher: pipeInput}
-		return c.Fetch(ctx, pipe, bucket, key)
+		c := pipes.NewPipeWithCancellation(pipeInput)
+		return c.Stream(ctx, pipe, bucket, key)
 	})
 
 	if err := g.Wait(); err != nil {
@@ -86,13 +54,13 @@ func Upload(pipe string, bucket string, key string, file string) {
 	// 1. Reads from local file and copies to pipe
 	// 2. Reads from target end of pipe and uploads to S3
 	g.Go(func() error {
-		c := &WithCancellation{fetcher: uploadInput}
-		return c.Fetch(ctx, pipe, bucket, key)
+		c := pipes.NewPipeWithCancellation(uploadInput)
+		return c.Stream(ctx, pipe, bucket, key)
 	})
 
 	g.Go(func() error {
-		c := &WithCancellation{fetcher: uploadOutput}
-		return c.Fetch(ctx, pipe, bucket, key)
+		c := pipes.NewPipeWithCancellation(uploadOutput)
+		return c.Stream(ctx, pipe, bucket, key)
 	})
 
 	if err := g.Wait(); err != nil {

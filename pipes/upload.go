@@ -24,9 +24,11 @@ type UploadInput struct {
 	UploadFile string
 }
 
-func (up *UploadOutput) Fetch(ctx context.Context, pipe string, bucket string, key string) error {
+func (up *UploadOutput) Stream(ctx context.Context, pipe string, bucket string, key string) error {
+	sess := session.Must(session.NewSession())
+
 	// Check bucket exists and we can access it
-	exists, err := s3helpers.BucketValidator(bucket)
+	exists, err := s3helpers.BucketValidator(sess, bucket)
 	if !exists {
 		return err
 	}
@@ -37,7 +39,6 @@ func (up *UploadOutput) Fetch(ctx context.Context, pipe string, bucket string, k
 	}
 	defer pipeFile.Close()
 
-	sess := session.Must(session.NewSession())
 	n, err := reader.PipeUpload(ctx, sess, bucket, key, pipeFile)
 	if err != nil {
 		return err
@@ -55,7 +56,7 @@ func (up *UploadOutput) Fetch(ctx context.Context, pipe string, bucket string, k
 	return nil
 }
 
-func (ui *UploadInput) Fetch(ctx context.Context, pipe string, bucket string, key string) error {
+func (ui *UploadInput) Stream(ctx context.Context, pipe string, bucket string, key string) error {
 	if len(ui.UploadFile) > 0 {
 		fmt.Printf("Upload from local file %s\n", ui.UploadFile)
 

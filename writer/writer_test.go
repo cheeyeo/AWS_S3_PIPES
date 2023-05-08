@@ -1,4 +1,4 @@
-package tests
+package writer
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/cheeyeo/AWS_S3_PIPES/writer"
+	"github.com/cheeyeo/AWS_S3_PIPES/tests"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -40,9 +40,9 @@ func TestWriterPipeDownload_ContextCancelled(t *testing.T) {
 	ctx.Error = fmt.Errorf("context canceled")
 	close(ctx.DoneCh)
 
-	pipe, _, _ := CreateTempFile(t, 1)
+	pipe, _, _ := tests.CreateTempFile(t, 1)
 
-	_, err := writer.PipeDownload(ctx, sess, "Bucket", "Key", pipe, 1)
+	_, err := PipeDownload(ctx, sess, "Bucket", "Key", pipe, 1)
 	if err == nil {
 		t.Errorf("Expected error but got nil")
 	}
@@ -88,9 +88,9 @@ func TestWriterPipeDownload(t *testing.T) {
 		r.HTTPResponse.Header.Set("Content-Length", fmt.Sprintf("%d", len(bodyBytes)))
 	})
 
-	pipe, _, _ := CreateTempFile(t, 1)
+	pipe, _, _ := tests.CreateTempFile(t, 1)
 
-	n, err := writer.PipeDownload(context.Background(), sess, "Bucket", "Key", pipe, 1)
+	n, err := PipeDownload(context.Background(), sess, "Bucket", "Key", pipe, 1)
 
 	if err != nil {
 		t.Errorf("Expected error but got nil")

@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/cheeyeo/AWS_S3_PIPES/files"
 	"github.com/cheeyeo/AWS_S3_PIPES/s3helpers"
 	"github.com/cheeyeo/AWS_S3_PIPES/writer"
 	"github.com/schollz/progressbar/v3"
@@ -26,9 +25,11 @@ type DownloadOutput struct {
 	File string
 }
 
-func (pi *DownloadInput) Fetch(ctx context.Context, pipe string, bucket string, key string) error {
+func (pi *DownloadInput) Stream(ctx context.Context, pipe string, bucket string, key string) error {
+	sess := session.Must(session.NewSession())
+
 	// Check bucket exists and we can access it
-	exists, err := s3helpers.BucketValidator(bucket)
+	exists, err := s3helpers.BucketValidator(sess, bucket)
 	if !exists {
 		return fmt.Errorf("DownloadInput: Unable to locate bucket: %v", err)
 	}
@@ -39,8 +40,7 @@ func (pi *DownloadInput) Fetch(ctx context.Context, pipe string, bucket string, 
 	}
 	defer pipeFile.Close()
 
-	sess := session.Must(session.NewSession())
-	fileSize, err := files.GetS3FileSize(sess, bucket, key)
+	fileSize, err := s3helpers.GetS3FileSize(sess, bucket, key)
 	if err != nil {
 		return fmt.Errorf("DownloadOutput: Unable to parse S3 file: %v", err)
 	}
@@ -53,7 +53,7 @@ func (pi *DownloadInput) Fetch(ctx context.Context, pipe string, bucket string, 
 	return nil
 }
 
-func (pi *DownloadOutput) Fetch(ctx context.Context, pipe string, bucket string, key string) error {
+func (pi *DownloadOutput) Stream(ctx context.Context, pipe string, bucket string, key string) error {
 	if len(pi.File) > 0 {
 		savedFile, err := os.Create(pi.File)
 		if err != nil {
@@ -68,7 +68,7 @@ func (pi *DownloadOutput) Fetch(ctx context.Context, pipe string, bucket string,
 		defer source.Close()
 
 		sess := session.Must(session.NewSession())
-		size, err := files.GetS3FileSize(sess, bucket, key)
+		size, err := s3helpers.GetS3FileSize(sess, bucket, key)
 		if err != nil {
 			return fmt.Errorf("DownloadOutput: Unable to parse S3 file: %v", err)
 		}
