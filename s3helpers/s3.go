@@ -28,6 +28,8 @@ func BucketValidator(sess *session.Session, bucket string) (bool, error) {
 			case "Forbidden":
 				msg := fmt.Sprintf("Bucket %s is forbidden", bucket)
 				return false, errors.New(msg)
+			default:
+				return false, errors.New(awsErr.Message())
 			}
 		} else {
 			return false, err
