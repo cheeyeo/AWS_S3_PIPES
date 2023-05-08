@@ -11,7 +11,7 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-// Generate slice data
+// GenerateSlice returns a data slice
 func GenerateSlice(start, end, step int) []int {
 	if step <= 0 || end < start {
 		return []int{}
@@ -24,7 +24,7 @@ func GenerateSlice(start, end, step int) []int {
 	return s
 }
 
-// Test uploading file
+// UploadFile tries to open a given pipefile and copies the orig file to it
 func UploadFile(filePath string, pipeFile *os.File) error {
 	orig, err := os.Open(filePath)
 	if err != nil {

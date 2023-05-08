@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -60,7 +60,7 @@ func TestReaderPipeUpload(t *testing.T) {
 	sess.Handlers.Send.PushBack(func(r *request.Request) {
 		r.HTTPResponse = &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewReader([]byte(respMsg))),
+			Body:       io.NopCloser(bytes.NewReader([]byte(respMsg))),
 		}
 	})
 
