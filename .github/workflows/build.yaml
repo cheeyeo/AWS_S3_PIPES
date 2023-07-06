@@ -20,11 +20,11 @@ jobs:
       run: |
         go mod download
         go mod tidy -v
-
-    - name: Build project
-      run: |
-        make build
     
     - name: Test project
       run: |
         make test
+
+    - name: Build project
+      run: |
+        make build
